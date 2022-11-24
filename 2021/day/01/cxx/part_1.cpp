@@ -8,12 +8,10 @@ int main ()
 
   std::cout << "Advent of code: day 01" << std::endl;
 
-  auto is_greater = [prev = std::numeric_limits<int>::max()] (auto input) mutable {
-    auto cur = std::atoi(input.c_str());
+  auto is_greater = [prev = std::numeric_limits<int>::max()] (auto cur) mutable {
     return std::exchange(prev, cur) < cur;
   };
-
-  auto n = count_if(std::istream_iterator<std::string>{std::cin}, std::istream_iterator<std::string>{}, is_greater);
+  auto n = count_if(std::istream_iterator<int>{std::cin}, std::istream_iterator<int>{}, is_greater);
 
   std::cout << "Answer: " << n << std::endl;
 

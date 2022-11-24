@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <numeric>
 #include <iterator>
 #include <limits>
 #include <vector>
@@ -13,30 +14,21 @@ int main ()
 {
   std::cout << "Advent of code: day 01" << std::endl;
 
-  auto is_greater = [prev = std::numeric_limits<int>::max()] (auto cur) mutable {
-    return std::exchange(prev, cur) < cur;
-  };
-
   auto list = std::list<int>{};
-
-  for_each(std::istream_iterator<std::string>{std::cin}, std::istream_iterator<std::string>{}, [&list, window = window_t{}] (auto input) mutable
+  for_each(std::istream_iterator<int>{std::cin}, std::istream_iterator<int>{}, [&list, window = window_t{}] (auto cur) mutable
      {
-        auto cur = std::atoi(input.c_str());
-
         window.push_back(cur);
         if (window.size() == 3)
         {
-          auto count = 0;
-          for (auto value : window)
-          {
-            count += value;
-          }
-          list.push_back(count);
+          list.push_back(std::accumulate(std::begin(window), std::end(window), 0));
           window.pop_front();
         }
      }
   );
 
+  auto is_greater = [prev = std::numeric_limits<int>::max()] (auto cur) mutable {
+    return std::exchange(prev, cur) < cur;
+  };
   auto n = count_if(list.begin(), list.end(), is_greater);
 
   std::cout << "Answer: " << n << std::endl;
