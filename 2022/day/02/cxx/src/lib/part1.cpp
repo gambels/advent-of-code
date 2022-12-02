@@ -1,29 +1,4 @@
-/*
-  Column 1     Column 2       Points
-  A: Rock      X: Rock        1
-  B: Paper     Y: Paper       2
-  C: Scissors  Z: Scissors    3
-
-  Points
-  Lost: 0
-  Draw: 3
-  Won : 6
-
-  For example, suppose you were given the following strategy guide:
-
-  A Y : Rock Paper (2)        : Lost (6) : 8
-  B X : Paper Rock (1)        : Lost (0) : 1
-  C Z : Scissors Scissors (3) : Draw (3) : 6
-
-  Paper    > Rock
-  Rock     > Scissors
-  Scissors > Paper
-
-  Total: 15
-*/
-
 #include "part1.h"
-#include "common.hpp"
 
 #include <algorithm>
 #include <iterator>

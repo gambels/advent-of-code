@@ -1,3 +1,26 @@
+/*
+  Column 1     Column 2       Points
+  A: Rock      X: Rock        1
+  B: Paper     Y: Paper       2
+  C: Scissors  Z: Scissors    3
+
+  Points
+  Lost: 0
+  Draw: 3
+  Won : 6
+
+  For example, suppose you were given the following strategy guide:
+
+  A Y : Rock Paper (2)        : Lost (6) : 8
+  B X : Paper Rock (1)        : Lost (0) : 1
+  C Z : Scissors Scissors (3) : Draw (3) : 6
+
+  Paper    > Rock
+  Rock     > Scissors
+  Scissors > Paper
+
+  Total: 15
+*/
 #pragma once
 
 #include <map>
@@ -13,18 +36,21 @@ enum class GameResult
   LOST, DRAW, WON
 };
  
+inline
 auto handshape2points(HandShape shape)
 {
   auto points = std::map<HandShape, int>{ {HandShape::ROCK,1}, {HandShape::PAPER,2}, {HandShape::SCISSORS,3} };
   return points[shape];
 }
 
+inline
 auto gameresult2points(GameResult result)
 {
   auto points = std::map<GameResult, int>{ {GameResult::LOST, 0}, {GameResult::DRAW, 3}, {GameResult::WON, 6} };
   return points[result];
 }
 
+inline
 auto do_play (HandShape player, HandShape enemy)
 {
   auto rv = GameResult{GameResult::DRAW};
@@ -69,43 +95,4 @@ auto do_play (HandShape player, HandShape enemy)
   }
 
  return rv;
-}
-
-struct Input                                                                                                                       
-{
-  Input() {}
-
-  auto lhs() -> HandShape
-  {
-    return input2shape[lhs_];
-  }
-
-  auto rhs() -> HandShape
-  {
-    return input2shape[rhs_];
-  }
-
-  explicit operator std::string() const
-  {
-    auto ss = std::stringstream{};
-    ss << lhs_ << " " << rhs_;
-    return ss.str();
-  }
-
-  char lhs_;
-  char rhs_;
-
-  std::map<char, HandShape> input2shape = { 
-    {'A', HandShape::ROCK},
-    {'B', HandShape::PAPER},
-    {'C', HandShape::SCISSORS},
-    {'X', HandShape::ROCK},
-    {'Y', HandShape::PAPER},
-    {'Z', HandShape::SCISSORS}};
-};
-
-std::istream& operator>>(std::istream& in, Input& input)
-{
-  in >> input.lhs_ >> input.rhs_;
-  return in;
 }
