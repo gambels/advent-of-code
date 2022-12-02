@@ -1,4 +1,5 @@
 #include "part2.h"
+#include "common.hpp"
 
 #include <algorithm>
 #include <iterator>

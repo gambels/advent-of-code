@@ -35,8 +35,8 @@ enum class GameResult
 {
   LOST, DRAW, WON
 };
- 
-inline
+
+inline 
 auto handshape2points(HandShape shape)
 {
   auto points = std::map<HandShape, int>{ {HandShape::ROCK,1}, {HandShape::PAPER,2}, {HandShape::SCISSORS,3} };
@@ -51,48 +51,20 @@ auto gameresult2points(GameResult result)
 }
 
 inline
-auto do_play (HandShape player, HandShape enemy)
+auto do_play(HandShape player, HandShape enemy)
 {
-  auto rv = GameResult{GameResult::DRAW};
+  auto rule_set = std::map<std::pair<HandShape, HandShape>, GameResult> {
+    {{HandShape::ROCK,     HandShape::SCISSORS}, GameResult::WON},
+    {{HandShape::ROCK,     HandShape::PAPER},    GameResult::LOST},
+    {{HandShape::ROCK,     HandShape::ROCK},     GameResult::DRAW},
 
-  switch (player)
-  {
-    case HandShape::ROCK:
-      switch (enemy)
-      {
-        case HandShape::PAPER:
-          rv = GameResult::LOST;
-          break;
-        case HandShape::SCISSORS:
-          rv = GameResult::WON;
-          break;
-      }
-      break;
-
-    case HandShape::PAPER:
-      switch (enemy)
-      {
-        case HandShape::SCISSORS:
-          rv = GameResult::LOST;
-          break;
-        case HandShape::ROCK:
-          rv = GameResult::WON;
-          break;
-      }
-      break;
-
-    case HandShape::SCISSORS:
-      switch (enemy)
-      {
-        case HandShape::ROCK:
-          rv = GameResult::LOST;
-          break;
-        case HandShape::PAPER:
-          rv = GameResult::WON;
-          break;
-      }
-      break;
-  }
-
- return rv;
+    {{HandShape::SCISSORS, HandShape::PAPER},    GameResult::WON},
+    {{HandShape::SCISSORS, HandShape::ROCK},     GameResult::LOST},
+    {{HandShape::SCISSORS, HandShape::SCISSORS}, GameResult::DRAW},
+    
+    {{HandShape::PAPER,    HandShape::ROCK},     GameResult::WON},
+    {{HandShape::PAPER,    HandShape::SCISSORS}, GameResult::LOST},
+    {{HandShape::PAPER,    HandShape::PAPER},    GameResult::DRAW},
+  };
+  return rule_set[std::make_pair(player, enemy)];
 }

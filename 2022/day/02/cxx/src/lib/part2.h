@@ -18,44 +18,23 @@ class Part2
 
       auto rhs() -> HandShape
       {
-          auto do_win = [] (auto shape) {
-          auto rv = HandShape{};
-          switch (shape)
-          {
-            case HandShape::ROCK:
-              rv = HandShape::PAPER;
-              break;
-            case HandShape::PAPER:
-              rv = HandShape::SCISSORS;
-              break;
-            case HandShape::SCISSORS:
-              rv = HandShape::ROCK;
-              break;            
-          }
-          return rv;
-        };
-        auto do_loose = [] (auto shape) {
-          auto rv = HandShape{};
-          switch (shape)
-          {
-            case HandShape::PAPER:
-              rv = HandShape::ROCK;
-              break;
-            case HandShape::SCISSORS:
-              rv = HandShape::PAPER;
-              break;
-            case HandShape::ROCK:
-              rv = HandShape::SCISSORS;
-              break;            
-          }
-          return rv;
-        };
+        auto lose_rule_set = std::map<HandShape, HandShape> {
+            {HandShape::ROCK, HandShape::SCISSORS},
+            {HandShape::PAPER, HandShape::ROCK},
+            {HandShape::SCISSORS, HandShape::PAPER}
+          };
 
+        auto win_rule_set = std::map<HandShape, HandShape> {
+            {HandShape::ROCK, HandShape::PAPER},
+            {HandShape::PAPER, HandShape::SCISSORS},
+            {HandShape::SCISSORS, HandShape::ROCK}
+          };
+  
         auto rv = HandShape{};    
         switch(auto game_result = input2result[rhs_])
         {
           case GameResult::LOST:
-            rv = do_loose(lhs());
+            rv = lose_rule_set[lhs()];
             break;
 
           case GameResult::DRAW:
@@ -63,7 +42,7 @@ class Part2
             break;
 
           case GameResult::WON:
-            rv = do_win(lhs());
+            rv = win_rule_set[lhs()];
             break;
         }
         return rv;
