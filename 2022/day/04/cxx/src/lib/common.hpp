@@ -18,11 +18,7 @@ struct Input
 
     [[nodiscard]] static auto is_part_of(auto a, auto b) -> bool
     {
-      if (a.first < b.first && a.second < b.second && b.first <= a.second)
-      {
-        return true;
-      }
-      if (a.first < b.first && a.second < b.second && b.first <= a.second)
+      if (a.first <= b.first && b.first <= a.second)
       {
         return true;
       }
