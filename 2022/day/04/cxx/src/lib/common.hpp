@@ -34,6 +34,5 @@ std::istream& operator>>(std::istream& in, Input& input)
 {
   auto c = char{};
   in >> input._a.first >> c >> input._a.second >> c >> input._b.first >> c >> input._b.second;
-
   return in;
 }
