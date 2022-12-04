@@ -22,7 +22,7 @@ auto Part1::handle_input(std::istream& in) -> std::size_t
     auto a = input.substr(0, len);  
     auto b = input.substr(len, input.size());
 
-    auto it = std::find_first_of(std::begin(a), std::end(b), std::begin(b), std::end(b));
+    auto it = std::find_first_of(std::begin(a), std::end(a), std::begin(b), std::end(b));
     auto prio = static_cast<int>(*it) - 'a' + 1 ;
     if (std::isupper(*it))
     {
