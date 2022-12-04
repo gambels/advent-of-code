@@ -18,7 +18,7 @@ struct Input
 
     [[nodiscard]] static auto is_part_of(auto a, auto b) -> bool
     {
-      if (a.first <= b.first && b.first <= a.second)
+      if (b.first <= a.second && a.first <= b.second)
       {
         return true;
       }
@@ -29,7 +29,7 @@ struct Input
     std::pair<int, int> _b;
 };
 
-inline 
+inline
 std::istream& operator>>(std::istream& in, Input& input)
 {
   auto c = char{};
