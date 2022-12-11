@@ -2,14 +2,17 @@
 
 #include <iostream>
 
-class Part1
+namespace aoc
 {
-  public:
-    Part1();
+  class Part1
+  {
+    public:
+      Part1();
 
-    [[nodiscard]] auto handle_input(std::istream& in) -> size_t;
+      [[nodiscard]] auto handle_input(std::istream& in) -> size_t;
 
-  protected:
+    protected:
 
-  private:
-};
+    private:
+  };
+} // namespace aoc

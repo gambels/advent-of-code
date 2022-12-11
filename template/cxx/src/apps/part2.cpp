@@ -5,6 +5,6 @@
 int main ()
 {
   std::cout << "Adven of code: day " << AOE_DAY << " / part 2" << std::endl;
-  std::cout << "Answer: " << Part2{}.handle_input(std::cin) << std::endl;
+  std::cout << "Answer: " << aoc::Part2{}.handle_input(std::cin) << std::endl;
   return 0;
 }

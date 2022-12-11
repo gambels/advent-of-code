@@ -4,9 +4,7 @@
 
 int main ()
 {
-  auto part1 = Part1{};
-
   std::cout << "Adven of code: day " << AOE_DAY << " / part 1" << std::endl;
-  std::cout << "Answer: " << Part1().handle_input(std::cin) << std::endl;
+  std::cout << "Answer: " << aoc::Part1{}.handle_input(std::cin) << std::endl;
   return 0;
 }
