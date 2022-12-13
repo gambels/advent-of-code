@@ -1,23 +1,18 @@
 #pragma once
 
 #include <istream>
-#include <sstream>
 #include <ranges>
 #include <algorithm>
 #include <optional>
 #include <numeric>
 
 #include <vector>
-#include <list>
-#include <map>
-#include <set>
 #include <queue>
 
 
 namespace aoc
 {
-
-  using map_t = std::vector<std::string>;
+  using height_map_t = std::vector<std::string>;
 
   struct Point
   {
@@ -37,13 +32,22 @@ namespace aoc
     {
       return Point{row - 1, col, cost + 1};
     }
-
-    auto is_bound(auto min_row, auto max_row, auto min_col, auto max_col)
+    
+    auto neighbors()
     {
+      return std::vector{left(), right(), down(), up()};
+    }
+
+    auto is_bound(const height_map_t& map)
+    {
+      auto min_row = 0;
+      auto max_row = map.size() -1;
       if (row < min_row || max_row < row)
       {
         return false;
       }
+      auto min_col = 0;
+      auto max_col = map[0].size() -1;
       if (col < min_col || max_col < col)
       {
         return false;
@@ -54,6 +58,54 @@ namespace aoc
     int row = 0;
     int col = 0;
     int cost = 0;
+  };
+
+  struct Queue
+  {
+    using queue_t = std::queue<Point>;
+    using path_map_t = std::vector<std::vector<int>>;
+
+    Queue(const height_map_t& map) :
+      path_map(map.size(), std::vector<int>(map[0].length(), -1))
+    {}
+
+    Queue(const height_map_t& path_map, Point init) :
+      Queue{path_map}
+    {
+      enqueue(init);
+    }
+
+    auto enqueue (Point p) -> bool
+    {
+      queue.push(p);
+      path_map[p.row][p.col] = p.cost;
+      return true;
+    }
+    
+    auto dequeue()
+    {
+      auto p = queue.front();
+      queue.pop();
+      return p;
+    };
+
+    auto empty()
+    {
+      return queue.empty();
+    }
+
+    auto visited(Point p)
+    {
+      return (path_map[p.row][p.col] != -1);
+    }
+
+    auto operator() (Point p)
+    {
+      return path_map[p.row][p.col];
+    }
+
+    queue_t queue;
+    path_map_t path_map;
   };
 
   struct Input
@@ -86,9 +138,9 @@ namespace aoc
   }
 
   inline 
-  auto make_map(std::istream& in)
+  auto make_height_map(std::istream& in)
   {
-    auto map = map_t{};
+    auto map = height_map_t{};
     auto start = Point{};
     auto end = Point{};
 
@@ -117,7 +169,6 @@ namespace aoc
     {
       to = std::exchange(from, to);
     }
-
     // Normalize points.
     from = (from == 'S') ? 'a' : from;
     to = (to == 'E') ? 'z' : to;
@@ -126,115 +177,57 @@ namespace aoc
   }
 
   inline
-  auto do_hill_climb(const map_t& map, Point start, Point end)
+  auto do_hill_climb(const height_map_t& height_map, Point start, Point end)
   {
-    auto max_cost = std::numeric_limits<int>::max();
-    auto path_map = std::vector<std::vector<int>>(map.size(), std::vector<int>(map[0].length(), max_cost));
-
-    auto can_step = [&] (Point from, Point to)
-    {
-      // Check bounds,
-      if (!to.is_bound(0, map.size() -1 , 0, map[0].size() -1))
-      {
-        return false;
-      }
-      // Check shortest path.
-      if (to.cost >= path_map[to.row][to.col])
-      {
-        return false;
-      }
-      return is_elevation_ok(map[from.row][from.col], map[to.row][to.col], false);
-    };
-    
-    auto queue = std::queue<Point>{};
-    auto enqueue = [&] (auto p)
-    {
-      queue.push(p);
-      path_map[p.row][p.col] = p.cost;
-    };
-    auto dequeue = [&] ()
-    {
-      auto p = queue.front();
-      queue.pop();
-      return p;
-    };
-
-    enqueue(start);
+    auto queue = Queue{height_map, start};
     while (!queue.empty())
     {
-      auto from = dequeue();
-      if (map[from.row][from.col] == 'E')
+      auto from = queue.dequeue();
+      if (height_map[from.row][from.col] == 'E')
       {
         continue;
       }
-      for (auto dir : {&Point::left, &Point::right, &Point::up, &Point::down})
+      auto is_stepable = [&] (Point from, Point to)
       {
-        auto to = (from.*dir)();
-        if (can_step(from, to))
+        if (!to.is_bound(height_map) || queue.visited(to))
         {
-         queue.push(to);
-         path_map[to.row][to.col] = to.cost;
+          return false;
         }
-      }
+        return is_elevation_ok(height_map[from.row][from.col], height_map[to.row][to.col], false);
+      };
+      std::ranges::for_each(from.neighbors(), [&] (auto to) {
+        is_stepable(from, to) && queue.enqueue(to);
+      });
     }
-    return path_map[end.row][end.col];
+    return queue(end);
   }
 
   inline
-  auto do_hill_climb_backwards(const map_t& map, Point end)
+  auto do_hill_climb_backwards(const height_map_t& height_map, Point end)
   {
-    auto max_cost = std::numeric_limits<int>::max();
-    auto path_map = std::vector<std::vector<int>>(map.size(), std::vector<int>(map[0].length(), max_cost));
-
-    auto can_step = [&] (Point from, Point to)
-    {
-      const auto backwards = true;
-
-      // Check bounds,
-      if (!to.is_bound(0, map.size() -1 , 0, map[0].size() -1))
-      {
-        return false;
-      }
-      // Check shortest path.
-      if (to.cost >= path_map[to.row][to.col])
-      {
-        return false;
-      }
-      return is_elevation_ok(map[from.row][from.col], map[to.row][to.col], backwards);
-    };
+    auto queue = Queue{height_map, end};
+    auto best_cost = std::numeric_limits<int>::max();   
     
-    auto best_cost = max_cost; 
-    auto queue = std::queue<Point>{};
-
-    auto enqueue = [&] (auto p)
-    {
-      queue.push(p);
-      path_map[p.row][p.col] = p.cost;
-    };
-    auto dequeue = [&] ()
-    {
-      auto p = queue.front();
-      queue.pop();
-      return p;
-    };
-    
-    enqueue(end);
     while (!queue.empty())
     {
-      auto from = dequeue();
-      if (map[from.row][from.col] == 'S' || map[from.row][from.col] == 'a')
+      auto from = queue.dequeue();
+      if (height_map[from.row][from.col] == 'S' || height_map[from.row][from.col] == 'a')
       {
         best_cost = from.cost < best_cost ? from.cost : best_cost;
         continue;
       }
-      for (auto dir : {&Point::left, &Point::right, &Point::up, &Point::down})
+      auto is_stepable = [&] (Point from, Point to)
       {
-        auto to = (from.*dir)();
-        if (can_step(from, to))
+        const auto backwards = true;
+        if (!to.is_bound(height_map) || queue.visited(to))
         {
-          enqueue(to);
+          return false;
         }
-      }
+        return is_elevation_ok(height_map[from.row][from.col], height_map[to.row][to.col], backwards);
+      };
+      std::ranges::for_each(from.neighbors(), [&] (auto to) {
+        is_stepable(from, to) && queue.enqueue(to);
+      });
     }
     return best_cost;
   }

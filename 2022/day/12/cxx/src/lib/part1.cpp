@@ -8,7 +8,7 @@ Part1::Part1()
 
 auto Part1::handle_input(std::istream& in) -> std::size_t
 {
-  auto [map, points] = make_map(in);
+  auto [map, points] = make_height_map(in);
   auto [start, end] = points;
 
   return do_hill_climb(map, start, end);
